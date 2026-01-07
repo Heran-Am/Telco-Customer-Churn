@@ -1,0 +1,22 @@
+# ========= Data (never commit raw data) =========
+data/
+!data/.gitkeep
+
+# ========= Models / artifacts =========
+models/
+*.pkl
+*.joblib
+
+# ========= Python / Jupyter junk =========
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# ========= VS Code / OS =========
+.vscode/
+.DS_Store
+
+# ========= Environments / secrets =========
+.venv/
+venv/
+.env

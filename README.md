@@ -60,7 +60,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
-## Run the pipeline 
+## Run the pipeline
 python src/01_load_and_inspect.py
 python src/02_clean_data.py
 python src/03_eda_plots.py
@@ -82,3 +82,28 @@ Conclusion: Logistic Regression slightly outperformed Random Forest on this spli
 
 Baseline confusion matrix (LogReg @ 0.35): [[826, 209], [105, 269]]
 Format: [[TN, FP], [FN, TP]]
+
+## What drives churn? (model interpretation)
+
+
+Higher churn risk (positive association):
+
+⦁	Month-to-month contract
+
+⦁	Fiber optic internet service
+	
+⦁	Electronic check payment method
+
+⦁	No dependents
+
+Lower churn risk (negative association):
+
+⦁	Higher tenure months (strongest)
+	
+⦁	Two-year contract
+	
+⦁	Having dependents
+	
+⦁	DSL / no internet service indicators
+	
+⦁	These are model associations, not guaranteed causal effects

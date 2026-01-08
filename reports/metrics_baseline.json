@@ -1,0 +1,19 @@
+{
+  "threshold": 0.35,
+  "accuracy": 0.7771469127040455,
+  "roc_auc": 0.8479449223694747,
+  "confusion_matrix": [
+    [
+      826,
+      209
+    ],
+    [
+      105,
+      269
+    ]
+  ],
+  "n_train": 5634,
+  "n_test": 1409,
+  "churn_rate_overall": 0.2653698707936959,
+  "churn_rate_test": 0.2654364797728886
+}

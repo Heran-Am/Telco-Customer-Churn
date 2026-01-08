@@ -5,38 +5,47 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score, classification_report, confusion_matrix
-
 
 DATA_PATH = Path("data/processed/telco_clean.csv")
 METRICS_PATH = Path("reports/metrics_baseline.json")
 
 
 def main():
-    print(">>> starting baseline training")
-
+    # 0) Load data
     if not DATA_PATH.exists():
         raise FileNotFoundError(
-            f"Processed file not found: {DATA_PATH}. Run src/02_clean_data.py first."
+            f"Processed file not found at {DATA_PATH}. Run src/02_clean_data.py first."
         )
 
     df = pd.read_csv(DATA_PATH)
 
     target = "Churn Value"
+    if target not in df.columns:
+        raise ValueError(f"Target column '{target}' not found. Columns: {df.columns.tolist()}")
+
     X = df.drop(columns=[target])
     y = df[target]
 
-    # Split columns by type
+    # 1) Train/test split (stratify keeps churn ratio similar)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y
+    )
+
+    # 2) Identify feature types
     numeric_features = X.select_dtypes(include=["number"]).columns.tolist()
     categorical_features = X.select_dtypes(exclude=["number"]).columns.tolist()
 
     print("Numeric features:", numeric_features)
     print("Categorical features:", categorical_features)
 
-    # Preprocessing pipelines
+    # 3) Preprocessing pipelines
     numeric_transformer = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler()),
@@ -52,47 +61,48 @@ def main():
         ("cat", categorical_transformer, categorical_features),
     ])
 
-    # Model
-    model = LogisticRegression(max_iter=2000)
-
+    # 4) Model
     clf = Pipeline(steps=[
         ("preprocess", preprocessor),
-        ("model", model),
+        ("model", LogisticRegression(max_iter=2000)),
     ])
 
-    # Train/test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
-    )
-
+    # 5) Train
     clf.fit(X_train, y_train)
 
-    # Predictions
-    y_pred = clf.predict(X_test)
-    y_prob = clf.predict_proba(X_test)[:, 1]
+    # 6) Predict + probabilities
+    threshold =0.35 
 
-    # Metrics
-    acc = accuracy_score(y_test, y_pred)
-    auc = roc_auc_score(y_test, y_prob)
+    y_proba = clf.predict_proba(X_test)[:, 1]
+    y_pred = (y_proba >= threshold).astype(int)
+
+    # 7) Metrics
+    accuracy = accuracy_score(y_test, y_pred)
+    roc_auc = roc_auc_score(y_test, y_proba)
     cm = confusion_matrix(y_test, y_pred)
 
     print("\n=== BASELINE RESULTS (Logistic Regression) ===")
-    print("Accuracy:", acc)
-    print("ROC-AUC:", auc)
+    print("Accuracy:", accuracy)
+    print("ROC-AUC:", roc_auc)
     print("\nConfusion matrix [ [TN FP], [FN TP] ]:\n", cm)
     print("\nClassification report:\n", classification_report(y_test, y_pred))
-
-    # Save metrics
+    print("Threshold:", threshold)
+    
+    # 8) Save metrics to JSON
     METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    
+
     metrics = {
-        "accuracy": acc,
-        "roc_auc": auc,
+        "threshold": float(threshold),
+        "accuracy": float(accuracy),
+        "roc_auc": float(roc_auc),                          
         "confusion_matrix": cm.tolist(),
         "n_train": int(len(X_train)),
         "n_test": int(len(X_test)),
         "churn_rate_overall": float(y.mean()),
         "churn_rate_test": float(y_test.mean()),
     }
+
     METRICS_PATH.write_text(json.dumps(metrics, indent=2))
     print("\nSaved metrics to:", METRICS_PATH)
 

@@ -91,25 +91,25 @@ _ _ _
 
 Higher churn risk (positive association):
 
-⦁	Month-to-month contract
+-	Month-to-month contract
 
-⦁	Fiber optic internet service
+-	Fiber optic internet service
 	
-⦁	Electronic check payment method
+-	Electronic check payment method
 
-⦁	No dependents
+-	No dependents
 
 Lower churn risk (negative association):
 
-⦁	Higher tenure months (strongest)
+-	Higher tenure months (strongest)
 	
-⦁	Two-year contract
+-	Two-year contract
 	
-⦁	Having dependents
+-	Having dependents
 	
-⦁	DSL / no internet service indicators
+-	DSL / no internet service indicators
 	
-⦁	These are model associations, not guaranteed causal effects
+-	These are model associations, not guaranteed causal effects
 
 ### Cross-validation (5-fold, Logistic Regression)
 
@@ -121,8 +121,15 @@ Lower churn risk (negative association):
 | F1 | 0.619 ± 0.018 |
 | ROC-AUC | 0.857 ± 0.009 |
 
-
+--- 
 ### Additional model: HistGradientBoosting
 
 I also tested `HistGradientBoostingClassifier` (threshold = 0.35).  
 It did not outperform Logistic Regression on this split (lower ROC-AUC/F1/recall), so Logistic Regression remains the final model choice for this project.
+
+## Business takeaways (example actions)
+
+- Prioritize retention offers for **month-to-month** customers, especially with **fiber optic** and **electronic check**.
+- Trigger early interventions for **low-tenure** customers (highest churn risk period).
+- Promote longer contracts (1–2 year) with incentives to reduce churn.
+

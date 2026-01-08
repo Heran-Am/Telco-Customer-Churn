@@ -60,6 +60,8 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
+_ _ _ _
+
 ## Run the pipeline
 python src/01_load_and_inspect.py
 python src/02_clean_data.py
@@ -82,6 +84,7 @@ Conclusion: Logistic Regression slightly outperformed Random Forest on this spli
 
 Baseline confusion matrix (LogReg @ 0.35): [[826, 209], [105, 269]]
 Format: [[TN, FP], [FN, TP]]
+_ _ _ 
 
 ## What drives churn? (model interpretation)
 
@@ -107,3 +110,19 @@ Lower churn risk (negative association):
 ⦁	DSL / no internet service indicators
 	
 ⦁	These are model associations, not guaranteed causal effects
+
+### Cross-validation (5-fold, Logistic Regression)
+
+| Metric | Mean ± Std |
+|-------|------------|
+| Accuracy | 0.811 ± 0.009 |
+| Precision | 0.667 ± 0.020 |
+| Recall | 0.578 ± 0.021 |
+| F1 | 0.619 ± 0.018 |
+| ROC-AUC | 0.857 ± 0.009 |
+
+
+### Additional model: HistGradientBoosting
+
+I also tested `HistGradientBoostingClassifier` (threshold = 0.35).  
+It did not outperform Logistic Regression on this split (lower ROC-AUC/F1/recall), so Logistic Regression remains the final model choice for this project.
